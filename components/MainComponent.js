@@ -120,6 +120,15 @@ function MainNavigatorScreen() {
   );
 }
 
+// redux
+import { connect } from 'react-redux';
+import { fetchLeaders, fetchDishes, fetchComments } from '../redux/ActionCreators';
+const mapDispatchToProps = dispatch => ({
+  fetchLeaders: () => dispatch(fetchLeaders()),
+  fetchDishes: () => dispatch(fetchDishes()),
+  fetchComments: () => dispatch(fetchComments())
+});
+
 class Main extends Component {
   render() {
     return (
@@ -128,5 +137,11 @@ class Main extends Component {
       </NavigationContainer>
     );
   }
+  componentDidMount() {
+    // redux
+    this.props.fetchLeaders();
+    this.props.fetchDishes();
+    this.props.fetchComments();
+  }
 }
-export default Main;
+export default connect(null, mapDispatchToProps)(Main);
