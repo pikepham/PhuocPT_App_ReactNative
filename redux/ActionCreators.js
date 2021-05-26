@@ -65,3 +65,48 @@ const addComments = (comments) => ({
   type: ActionTypes.ADD_COMMENTS,
   payload: comments
 });
+
+export const postComment = (dishId, rating, author, comment) => (dispatch) => {
+  var newcmt = { dishId: dishId, rating: rating, author: author, comment: comment, date: new Date().toISOString() };
+  setTimeout(() => {
+    dispatch(addComment(newcmt));
+  }, 2000);
+};
+const addComment = (newcmt) => ({
+  type: ActionTypes.ADD_COMMENT,
+  payload: newcmt
+});
+
+// promotions
+export const fetchPromos = () => (dispatch) => {
+  dispatch(promosLoading());
+  return fetch(baseUrl + 'promotions')
+    .then(response => {
+      if (!response.ok) throw Error('Error ' + response.status + ': ' + response.statusText);
+      else return response.json();
+    })
+    .then(promos => dispatch(addPromos(promos)))
+    .catch(error => dispatch(promosFailed(error.message)));
+};
+const promosLoading = () => ({
+  type: ActionTypes.PROMOS_LOADING
+});
+const promosFailed = (errmess) => ({
+  type: ActionTypes.PROMOS_FAILED,
+  payload: errmess
+});
+const addPromos = (promos) => ({
+  type: ActionTypes.ADD_PROMOS,
+  payload: promos
+});
+
+// favorites
+export const postFavorite = (dishId) => (dispatch) => {
+  setTimeout(() => {
+    dispatch(addFavorite(dishId));
+  }, 2000);
+};
+const addFavorite = (dishId) => ({
+  type: ActionTypes.ADD_FAVORITE,
+  payload: dishId
+});

@@ -1,17 +1,15 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Main from './components/MainComponent';
-
-// redux
 import { Provider } from 'react-redux';
 import { ConfigureStore } from './redux/ConfigureStore';
 const store = ConfigureStore();
 
-export default class App extends React.Component {
+
+class App extends Component {
   render() {
-    return (
-     <Provider store={store}>
-        <Main />
-      </Provider>
-    );
+    return (<Provider store={store}>
+      <Main />
+    </Provider>);
   }
 }
+export default App;
