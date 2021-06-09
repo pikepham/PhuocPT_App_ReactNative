@@ -1,16 +1,25 @@
 import React, { Component } from "react";
-import { FlatList, Text } from "react-native";
+import { FlatList, Text, Alert } from "react-native";
 import { ListItem, Avatar } from "react-native-elements";
 import Loading from "./LoadingComponent";
 import { baseUrl } from "../shared/baseUrl";
+import Swipeout from "react-native-swipeout"; //delete favarite
+import * as Animatable from "react-native-animatable";
+
 // redux
 import { connect } from "react-redux";
+import { deleteFavorite } from "../redux/ActionCreators"; //delete favarite
 const mapStateToProps = (state) => {
   return {
     dishes: state.dishes,
     favorites: state.favorites,
   };
 };
+
+//delete favarite
+const mapDispatchToProps = (dispatch) => ({
+  deleteFavorite: (dishId) => dispatch(deleteFavorite(dishId)),
+});
 
 class Favorites extends Component {
   render() {
@@ -33,18 +42,50 @@ class Favorites extends Component {
   }
   renderMenuItem(item, index) {
     const { navigate } = this.props.navigation;
+    //delete favarite
+    const rightButton = [
+      {
+        text: "Delete",
+        type: "delete",
+        // onPress: () => this.props.deleteFavorite(item.id),
+        //3c Alert
+        onPress: () => {
+          Alert.alert(
+            "Delete Favorite?",
+            "Are you sure you wish to delete the favorite dish " +
+              item.name +
+              "?",
+            [
+              {
+                text: "Cancel",
+                onPress: () => {
+                  /* nothing */
+                },
+              },
+              { text: "OK", onPress: () => this.props.deleteFavorite(item.id) },
+            ],
+            { cancelable: false }
+          );
+        },
+      },
+    ];
+    //
     return (
-      <ListItem
-        key={index}
-        onPress={() => navigate("Dishdetail", { dishId: item.id })}
-      >
-        <Avatar source={{ uri: baseUrl + item.image }} />
-        <ListItem.Content>
-          <ListItem.Title>{item.name}</ListItem.Title>
-          <ListItem.Subtitle>{item.description}</ListItem.Subtitle>
-        </ListItem.Content>
-      </ListItem>
+      <Swipeout right={rightButton} autoClose={true}>
+        <Animatable.View animation="fadeInRightBig" duration={2000}>
+          <ListItem
+            key={index}
+            onPress={() => navigate("Dishdetail", { dishId: item.id })}
+          >
+            <Avatar source={{ uri: baseUrl + item.image }} />
+            <ListItem.Content>
+              <ListItem.Title>{item.name}</ListItem.Title>
+              <ListItem.Subtitle>{item.description}</ListItem.Subtitle>
+            </ListItem.Content>
+          </ListItem>
+        </Animatable.View>
+      </Swipeout>
     );
   }
 }
-export default connect(mapStateToProps)(Favorites);
+export default connect(mapStateToProps, mapDispatchToProps)(Favorites);
