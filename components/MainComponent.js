@@ -14,6 +14,11 @@ import Dishdetail from "./DishdetailComponent";
 
 import Favorites from "./FavoriteComponent";
 
+//4d
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import Login from "./LoginComponent";
+import Register from "./RegisterComponent";
+
 // redux
 import { baseUrl } from "../shared/baseUrl";
 // redux
@@ -24,6 +29,7 @@ import {
   fetchComments,
   fetchPromos,
 } from "../redux/ActionCreators";
+
 const mapDispatchToProps = (dispatch) => ({
   fetchLeaders: () => dispatch(fetchLeaders()),
   fetchDishes: () => dispatch(fetchDishes()),
@@ -267,6 +273,7 @@ function CustomDrawerContent(props) {
 }
 
 function MainNavigatorScreen() {
+  const MainNavigator = createDrawerNavigator();
   return (
     <MainNavigator.Navigator
       initialRouteName="Home"
@@ -334,7 +341,6 @@ function MainNavigatorScreen() {
           ),
         }}
       />
-
       <MainNavigator.Screen
         name="Favorites"
         component={FavoritesNavigatorScreen}
@@ -351,10 +357,101 @@ function MainNavigatorScreen() {
           ),
         }}
       />
+
+      <MainNavigator.Screen
+        name="Login"
+        component={LoginNavigatorScreen}
+        options={{
+          headerShown: false,
+          drawerIcon: ({ focused, size }) => (
+            <Icon
+              name="sign-in"
+              type="font-awesome"
+              size={size}
+              color={focused ? "#7cc" : "#ccc"}
+            />
+          ),
+        }}
+      />
     </MainNavigator.Navigator>
   );
 }
 
+function TabNavigatorScreen() {
+  const TabNavigator = createBottomTabNavigator();
+  return (
+    <TabNavigator.Navigator
+      initialRouteName="Login"
+      tabBarOptions={{
+        activeBackgroundColor: "#7cc",
+        inactiveBackgroundColor: "#fff",
+        activeTintColor: "#fff",
+        inactiveTintColor: "gray",
+      }}
+    >
+      <TabNavigator.Screen
+        name="Login"
+        component={Login}
+        options={{
+          tabBarLabel: "Login",
+          tabBarIcon: ({ color, size }) => (
+            <Icon
+              name="sign-in"
+              type="font-awesome"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+      <TabNavigator.Screen
+        name="Register"
+        component={Register}
+        options={{
+          tabBarLabel: "Register",
+          tabBarIcon: ({ color, size }) => (
+            <Icon
+              name="user-plus"
+              type="font-awesome"
+              size={size}
+              color={color}
+            />
+          ),
+        }}
+      />
+    </TabNavigator.Navigator>
+  );
+}
+
+function LoginNavigatorScreen() {
+  const LoginNavigator = createStackNavigator();
+  return (
+    <LoginNavigator.Navigator
+      initialRouteName="LoginRegister"
+      screenOptions={{
+        headerStyle: { backgroundColor: "#7cc" },
+        headerTintColor: "#fff",
+        headerTitleStyle: { color: "#fff" },
+      }}
+    >
+      <LoginNavigator.Screen
+        name="LoginRegister"
+        component={TabNavigatorScreen}
+        options={({ navigation }) => ({
+          headerTitle: "Login | Register",
+          headerLeft: () => (
+            <Icon
+              name="menu"
+              size={36}
+              color="#fff"
+              onPress={() => navigation.toggleDrawer()}
+            />
+          ),
+        })}
+      />
+    </LoginNavigator.Navigator>
+  );
+}
 class Main extends Component {
   componentDidMount() {
     // redux

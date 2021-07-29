@@ -1,21 +1,6 @@
-import React, { Component } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  FlatList,
-  Modal,
-  Button,
-  PanResponder,
-  Alert,
-} from "react-native";
-import { Card, Image, Icon, Input } from "react-native-elements";
-import { Rating } from "react-native-ratings";
-import { postFavorite, postComment } from "../redux/ActionCreators";
-import { baseUrl } from "../shared/baseUrl";
-import * as Animatable from "react-native-animatable";
 // redux
 import { connect } from "react-redux";
+import { postFavorite, postComment } from "../redux/ActionCreators";
 const mapStateToProps = (state) => {
   return {
     dishes: state.dishes,
@@ -28,19 +13,38 @@ const mapDispatchToProps = (dispatch) => ({
   postComment: (dishId, rating, author, comment) =>
     dispatch(postComment(dishId, rating, author, comment)),
 });
+
+import React, { Component } from "react";
+import {
+  View,
+  ScrollView,
+  Text,
+  FlatList,
+  YellowBox,
+  Modal,
+  Button,
+  PanResponder,
+  Alert,
+} from "react-native";
+import { Card, Image, Icon, Rating, Input } from "react-native-elements";
+import * as Animatable from "react-native-animatable";
+import { baseUrl } from "../shared/baseUrl";
+
 class RenderDish extends Component {
   render() {
-    // gesture 3e
+    // gesture
     const recognizeDrag = ({ moveX, moveY, dx, dy }) => {
-      if (dx < -200) return true; // right to left
-      return false;
+      if (dx < -200) return 1;
+      // right to left
+      else if (dx > 200) return 2; // left to right
+      return 0;
     };
     const panResponder = PanResponder.create({
       onStartShouldSetPanResponder: (e, gestureState) => {
         return true;
       },
       onPanResponderEnd: (e, gestureState) => {
-        if (recognizeDrag(gestureState)) {
+        if (recognizeDrag(gestureState) === 1) {
           Alert.alert(
             "Add Favorite",
             "Are you sure you wish to add " + dish.name + " to favorite?",
@@ -62,12 +66,13 @@ class RenderDish extends Component {
             ],
             { cancelable: false }
           );
+        } else if (recognizeDrag(gestureState) === 2) {
+          this.props.onPressComment();
         }
         return true;
       },
     });
-    ///3e
-    ///
+    // render
     const dish = this.props.dish;
     if (dish != null) {
       return (
@@ -120,7 +125,6 @@ class RenderComments extends Component {
     return (
       <Card>
         <Card.Title>Comments</Card.Title>
-        <Card.Divider />
         <FlatList
           data={comments}
           renderItem={({ item, index }) => this.renderCommentItem(item, index)}
@@ -129,6 +133,7 @@ class RenderComments extends Component {
       </Card>
     );
   }
+
   renderCommentItem(item, index) {
     return (
       <View key={index} style={{ margin: 10 }}>
@@ -156,11 +161,11 @@ class Dishdetail extends Component {
       author: "",
       comment: "",
     };
+    YellowBox.ignoreWarnings(["VirtualizedLists should never be nested"]); // ref: https://forums.expo.io/t/warning-virtualizedlists-should-never-be-nested-inside-plain-scrollviews-with-the-same-orientation-use-another-virtualizedlist-backed-container-instead/31361/6
   }
 
   render() {
     const dishId = parseInt(this.props.route.params.dishId);
-
     return (
       <ScrollView>
         <Animatable.View animation="fadeInDown" duration={2000} delay={1000}>
@@ -224,10 +229,13 @@ class Dishdetail extends Component {
       </ScrollView>
     );
   }
+
   markFavorite(dishId) {
     this.props.postFavorite(dishId);
   }
+
   submitComment(dishId) {
+    //alert(dishId + ':' + this.state.rating + ':' + this.state.author + ':' + this.state.comment);
     this.props.postComment(
       dishId,
       this.state.rating,
